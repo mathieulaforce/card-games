@@ -50,7 +50,7 @@ jobs:
         run: pnpm lint
 
   test_setup:
-    name: Test setup
+    name: deploy to vercel and wait
     runs-on: ubuntu-latest
     outputs:
       preview_url: ${{ steps.waitForVercelPreviewDeployment.outputs.url }}
