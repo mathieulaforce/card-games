@@ -1,49 +1,33 @@
 name: main actions
-on: "pull_request"
+on: 
+  pull_request:
+  push:
+    branches: [ trunk ]
+
 defaults:
   run:
     working-directory: lama-card-games
- 
-jobs:  
-  
-  run_test: 
-    runs-on: ubuntu-latest  
-    name: test linting and prettier 
-    steps:  
-      - name: Prepare env
+
+jobs:
+  run_test:
+    runs-on: ubuntu-latest
+    name: test linting and prettier
+    steps:
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-         node-version: "20"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-           version: 8.10.5
-           run_install: false 
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
- 
-      - name: Setup pnpm cache
-        uses: actions/cache@v3        
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+      - name: Setup Node.js and pnpm
+        uses: ./setup-node-pnpm.yml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: run tests
         run: pnpm test
 
       - name: check prettier
-        run: pnpm prettier:check 
+        run: pnpm prettier:check
+
       - name: lint
         run: pnpm lint
 
@@ -52,66 +36,53 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       preview_url: ${{ steps.waitForVercelPreviewDeployment.outputs.url }}
-    steps:      
-      - name: Wait for Vercel Preview       
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js and pnpm
+        uses: ./setup-node-pnpm.yml
+
+      - name: Wait for Vercel Preview
         uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
         id: waitForVercelPreviewDeployment
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           max_timeout: 600
- 
-  test_e2e: 
-    runs-on: ubuntu-latest  
+
+  test_e2e:
+    runs-on: ubuntu-latest
     needs: [test_setup]
     name: Playwright tests
     timeout-minutes: 5
-    steps: 
-      - name: Prepare env
+    steps:
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "20"
+      - name: Setup Node.js and pnpm
+        uses: ./setup-node-pnpm.yml
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.10.5
-          run_install: false 
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3        
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
- 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
- 
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
 
-      - name: Cache playwright binaries
+      - name: Cache Playwright binaries (if necessary)
         uses: actions/cache@v3
         id: playwright-cache
         with:
           path: |
             ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+      - name: Install Playwright (if necessary)
+        run: npx playwright install --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
 
-      - run: npx playwright install --with-deps
+      - name: Install Playwright dependencies
+        run: npx playwright install-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-      - run: npx playwright install-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-  
+
       - name: Run e2e tests
         run: pnpm run test:e2e
         env:
