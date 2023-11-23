@@ -9,11 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     name: test linting and prettier
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js and pnpm
+      - name: Call setup workflow
         uses: ./setup-node-pnpm.yml
+        with:
+          node-version: "20"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -33,11 +32,10 @@ jobs:
     outputs:
       preview_url: ${{ steps.waitForVercelPreviewDeployment.outputs.url }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js and pnpm
+      - name: Call setup workflow
         uses: ./setup-node-pnpm.yml
+        with:
+          node-version: "20"
 
       - name: Wait for Vercel Preview
         uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
@@ -52,11 +50,10 @@ jobs:
     name: Playwright tests
     timeout-minutes: 5
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js and pnpm
+      - name: Call setup workflow
         uses: ./setup-node-pnpm.yml
+        with:
+          node-version: "20"
 
       - name: Get installed Playwright version
         id: playwright-version
