@@ -1,5 +1,6 @@
 name: main actions
 on:
+  pull_request:
   push:
     branches: [ trunk ]
 
