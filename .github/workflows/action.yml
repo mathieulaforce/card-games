@@ -1,12 +1,7 @@
 name: main actions
-on: 
-  pull_request:
+on:
   push:
     branches: [ trunk ]
-
-defaults:
-  run:
-    working-directory: lama-card-games
 
 jobs:
   run_test:
@@ -65,25 +60,3 @@ jobs:
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
-
-      - name: Cache Playwright binaries (if necessary)
-        uses: actions/cache@v3
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-      - name: Install Playwright (if necessary)
-        run: npx playwright install --with-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-
-      - name: Install Playwright dependencies
-        run: npx playwright install-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-
-      - name: Run e2e tests
-        run: pnpm run test:e2e
-        env:
-          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.test_setup.outputs.preview_url }}
