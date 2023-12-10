@@ -1,0 +1,20 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1702207685891,
+      "tag": "0000_game_gamesession_migration",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1702216665562,
+      "tag": "0001_add_gamesession_flags",
+      "breakpoints": true
+    }
+  ]
+}

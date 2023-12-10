@@ -1,0 +1,117 @@
+{
+  "id": "24c16499-b7af-4b56-9a4c-7f874faf080c",
+  "prevId": "7a41af32-a536-4b4e-92d1-10dfc2329d69",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "game": {
+      "name": "game",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "gameSession": {
+      "name": "gameSession",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "gameId": {
+          "name": "gameId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maxNumberOfPlayers": {
+          "name": "maxNumberOfPlayers",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numberOfPlayers": {
+          "name": "numberOfPlayers",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isSessionStarted": {
+          "name": "isSessionStarted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "isLocked": {
+          "name": "isLocked",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "gameSession_gameId_game_id_fk": {
+          "name": "gameSession_gameId_game_id_fk",
+          "tableFrom": "gameSession",
+          "tableTo": "game",
+          "columnsFrom": [
+            "gameId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}
